@@ -1,2 +1,2 @@
 # Python
-Contains the works in python
+Contains works in python
