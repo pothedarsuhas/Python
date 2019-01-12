@@ -1,5 +1,5 @@
-#completed api bundle for a single path backed up with the
-#inbuilt database
+#basic api bundle for a single path, backed up with the
+#inbuilt database, all in one
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
@@ -15,6 +15,7 @@ app = Flask(__name__)
 api = Api(app)
 
 class ItemList(Resource):
+    
     def get(self):
         con = sqlite3.connect('Django.db')
         sql = "select * from alan"
@@ -24,11 +25,9 @@ class ItemList(Resource):
         con.close()
         return { "result" : str(result) }
 
-
-
+    
 class Item(Resource):
-
-
+    
     def get(self,name):
         parser = reqparse.RequestParser()
         parser.add_argument(name, help="pass name", required = True )
@@ -52,7 +51,6 @@ class Item(Resource):
         result = cur.execute(sql, (name, price))
         cur.execute("commit")
         result = result.fetchall()
-
         con.close()
         return { "result" : str(result)+" created" }
 
@@ -95,6 +93,6 @@ api.add_resource(ItemList, '/items')
 api.add_resource(Item, '/item/<string:name>')
 
 if __name__=="__main__":
-  app.run(port = 5052, debug = True)
+  app.run(port = 5052, debug = True) #any port can be used here
 
 
