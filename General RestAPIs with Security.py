@@ -5,43 +5,45 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 import sqlite3
-from flask_jwt import JWT
+from flask_jwt import JWT, jwt_required
+from werkzeug.security import safe_str_cmp
+
 
 
 con = sqlite3.connect('Django.db')
 sql = "create table if not exists alan(name varchar2(150), price number)"
 cur = con.cursor()
 cur.execute(sql)
-sql = "create table if not exists users(username varchar2(150), password varchar2(150)"
+sql = "create table if not exists users(id number, username varchar2(150), password varchar2(150))"
 cur.execute(sql)
 con.close()
 
 
 def authenticate(username, password):
     con = sqlite3.connect('Django.db')
-    sql = "select * from users where username = ?"
     cur = con.cursor()
-    result = cur.execute(sql,(username,))
-    result = result.fetchall()
-    if result is not None and result[0][1] == password:
-        return result if not None else None
+    sql = "select * from users where username = ? limit 1"
+    cur.execute(sql,(username,))
+    result = cur.fetchone()
+    if str(result[2]) == str(password) and result is not None:
+        return { "id": result[0], "username": result[1], 'password': result[2]}
 
-def identify(payload):
+def identity(payload):
     user = payload['identity']
     con = sqlite3.connect('Django.db')
     sql = "select * from users where username = ? limit 1"
     cur = con.cursor()
-    result = cur.execute(sql,(user,))
-    result = result.fetchall()
-    if result is not None and result[0][1] == password:
-      return result[0][1] if not None else None
+    cur.execute(sql,(user,))
+    result = cur.fetchone()
+    if result is not None:
+      return result
 
 
 app = Flask(__name__)
 app.secret_key = 'python'
 api = Api(app)
 
-jwt = JWT(app, authenticate, identify) # this creates /auth endpoint
+jwt = JWT(app, authenticate, identity) # this creates /auth endpoint
 
 class ItemList(Resource):
     @jwt_required
@@ -54,7 +56,7 @@ class ItemList(Resource):
         con.close()
         return { "result" : str(result) }
 
-    
+
 class Item(Resource):
     @jwt_required
     def get(self,name):
@@ -123,5 +125,4 @@ api.add_resource(Item, '/item/<string:name>')
 
 if __name__=="__main__":
   app.run(port = 5052, debug = True) #any port can be used here
-
 
