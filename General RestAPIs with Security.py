@@ -1,5 +1,6 @@
 #basic api bundle for a single path, backed up with the
 #inbuilt database & Security based on Single Sign On all in one
+#user registration still pending
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
