@@ -31,7 +31,7 @@ con = engine.connect()
 
 
 ins = students.insert().values(name='shazam',lastname='pothedar')  #this is insert
-con = engine.connect()
+
 result = con.execute(ins)
 print(result)
 
