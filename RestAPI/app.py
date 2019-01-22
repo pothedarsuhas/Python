@@ -3,8 +3,8 @@
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
-from resources import *
-from models import *
+from RestAPI.models.alan import *
+from RestAPI.resources.item import *
 
 
 app = Flask(__name__)
